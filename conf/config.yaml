@@ -54,7 +54,11 @@ apisix:
   #   - "::/64"
   # port_admin: 9180              # use a separate port
   # https_admin: true             # enable HTTPS when use a separate port for Admin API.
-                                  # Admin API will use conf/apisix_admin_api.crt and conf/apisix_admin_api.key as certificate.
+                                # Admin API will use conf/apisix_admin_api.crt and conf/apisix_admin_api.key as certificate.
+  admin_api_mtls:               # Depends on `port_admin` and `https_admin`.
+    admin_ssl_cert: ""             # Path of your self-signed server side cert.
+    admin_ssl_cert_key: ""         # Path of your self-signed server side key.
+    admin_ssl_ca_cert: ""          # Path of your self-signed ca cert.The CA is used to sign all admin api callers' certificates.
 
   # Default token when use API to call for Admin API.
   # *NOTE*: Highly recommended to modify this value to protect APISIX's Admin API.
@@ -100,7 +104,7 @@ nginx_config:                     # config for render the template to genarate n
   error_log: "logs/error.log"
   error_log_level: "warn"         # warn,error
   worker_rlimit_nofile: 20480     # the number of files a worker process can open, should be larger than worker_connections
-  worker_shutdown_timeout: 3s     # timeout for a graceful shutdown of worker processes
+  worker_shutdown_timeout: 240s     # timeout for a graceful shutdown of worker processes
   event:
     worker_connections: 10620
   http:
@@ -170,6 +174,7 @@ plugins:                          # plugin list
   - echo
   - authz-keycloak
   - uri-blocker
+  - request-validation
 
 stream_plugins:
   - mqtt-proxy
